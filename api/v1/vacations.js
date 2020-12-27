@@ -1,41 +1,44 @@
-var RESOURCE_NAME = 'vacations';
-var VERSION = 'v1';
-var URI = '/' + VERSION + '/' + RESOURCE_NAME;
+var RESOUCE_NAME = "vacations";
+var VERSION = "v1";
+var URI = "/" + VERSION + "/" + RESOUCE_NAME;
 
-var db = require('../../db/vactaions');
+var db = require("../../db/vacations");
 
-module.exports = function(router) {
-    'use strict'
+module.exports = (router) => {
+  "use strict";
 
-    router.route(URI).get(function(req, res, next) {
-        console.log("GET vacations");
+  //Retrieve all action vacation packages
+  //Active = validTill >= Todays Date
 
-        var criteria = { validTill: {$gte: new Date()}}
+  // /v1/vacations
+  router.route(URI).get((req, res, next) => {
+    console.log("GET Vacations");
 
-        db.select(criteria, function(err, docs) {
-            if(err) {
-                console.log(err);
-                res.status(500);
-                res.send("error connecting to db")
-            } else {
-                if(docs.length == 0) {
-                    res.status(400)
-                }
-                console.log("Retrieved vactions = %d", docs.length);
-                res.send(docs)
-            }
-        })
-    })
+    var criteria = { validTil: { $gte: new Date() } };
 
-    router.route(URI).post(function(req, res, next){
-        console.log("Post vacations");
+    db.select(criteria, (err, docs) => {
+      if (err) {
+        console.log(err);
+        res.status(500);
+        res.send(err);
+      } else {
+        if (docs.length == 0) {
+          res.status(404);
+        }
+        console.log("Retrieved vacations");
+      }
+    });
+  });
 
-        var doc = req.body;
+  router.route(URI).post((req, res, next) => {
+    console.log("Post Vacations");
 
-        db.save(doc, function(err, saved) {
-            if(err){
-                
-            }
-        })
-    })
-}
+    var doc = req.body;
+
+    db.save(doc, (err, saved) => {
+      if (err) {
+        res.status(400).send(err);
+      }
+    });
+  });
+};
